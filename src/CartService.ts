@@ -33,6 +33,7 @@ export default class CartService {
       subtotal: item.products.price * item.qty,
     }));
 
+    // Hitung total harga dan total item pada seluruh produk dalam cart
     const totalPrice = products.reduce((sum, p) => sum + p.subtotal, 0);
     const totalItems = products.reduce((sum, p) => sum + p.qty, 0);
 
@@ -40,8 +41,8 @@ export default class CartService {
       cartName: cart.name,
       ownerUsername: cart.users.username,
       products,
-      totalItems,
       totalPrice,
+      totalItems,
       exportedAt: new Date().toISOString(),
     };
   }

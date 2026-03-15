@@ -5,14 +5,24 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default class MailSender {
   static generateEmailHtml(data: CartExportData): string {
+    const formatRupiah = (amount: number): string =>
+      amount
+        .toLocaleString("id-ID", {
+          style: "currency",
+          currency: "IDR",
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })
+        .replace(/\s/g, "");
+
     const productRows = data.products
       .map(
         (p) => `
         <tr>
           <td style="padding: 8px; border: 1px solid #ddd;">${p.productName}</td>
-          <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">Rp ${p.price.toLocaleString("id-ID")}</td>
+          <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${formatRupiah(p.price)}</td>
           <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${p.qty}</td>
-          <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">Rp ${p.subtotal.toLocaleString("id-ID")}</td>
+          <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${formatRupiah(p.subtotal)}</td>
         </tr>`,
       )
       .join("");
@@ -41,7 +51,7 @@ export default class MailSender {
               <td style="padding: 8px; border: 1px solid #ddd;">Total</td>
               <td style="padding: 8px; border: 1px solid #ddd;"></td>
               <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${data.totalItems}</td>
-              <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">Rp ${data.totalPrice.toLocaleString("id-ID")}</td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${formatRupiah(data.totalPrice)}</td>
             </tr>
           </tfoot>
         </table>
@@ -58,7 +68,8 @@ export default class MailSender {
   ): Promise<void> {
     const { error } = await resend.emails.send({
       from:
-        process.env.RESEND_FROM_EMAIL || "E-Commerce <onboarding@resend.dev>",
+        process.env.RESEND_FROM_EMAIL ||
+        "Collaborative Cart <onboarding@resend.dev>",
       to: [targetEmail],
       subject: `Laporan Keranjang Belanja: ${cartName}`,
       html: htmlContent,

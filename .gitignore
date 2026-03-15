@@ -3,4 +3,6 @@ node_modules/
 
 /generated/prisma
 
+.vscode/
+
 .env
